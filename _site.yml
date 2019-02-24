@@ -5,9 +5,9 @@ navbar:
     - text: "ごあんない"
       href: index.html
     - text: "Extra 1"
-      href: extra1.html
+      href: Extra1.html
     - text: "Extra 2"
-      href: extra2.html
+      href: Extra2.html
       
 output:
   html_document:
