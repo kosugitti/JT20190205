@@ -4,9 +4,9 @@ navbar:
   left:
     - text: "ごあんない"
       href: index.html
-    - text: "Extra 1"
+    - text: "番外編1"
       href: Extra1.html
-    - text: "Extra 2"
+    - text: "番外編2"
       href: Extra2.html
       
 output:
