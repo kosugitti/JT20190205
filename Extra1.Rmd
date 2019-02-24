@@ -1,0 +1,47 @@
+---
+title: "Extra 1; 打ち切りデータの分析"
+output: html_document
+---
+```{r libraries,echo=F,include=F}
+# データ整形汎用パッケージ
+library(tidyverse)
+# MCMC乱数発生器stanをRからつかうパッケージ
+library(rstan)
+# rstanを並列で使うオプション
+options(mc.cores = parallel::detectCores())
+# 変更なしの実行ファイルは保存しておくオプション
+rstan_options(auto_write = TRUE)
+# 描画の際に文字化けするMacユーザは次の行のコメントアウトをとって実行する
+old = theme_set(theme_gray(base_family = "HiraKakuProN-W3"))
+```
+
+## Case; Cha Sa Soon
+
+韓国在住の68歳，チャ・サスーンさんは，運転免許の筆記試験に合格しようとなんども挑戦した。韓国ではこの試験は50個の4択問題からなっていて，60点が合格ラインである。各正答は2点に相当するから，30問に正解しなければならない。
+
+チャ・サスーンさんを国際的に有名にしたのは，彼女が949回連続で不合格になり，のべ4200USドルに相当する出願料を支払ったからである。ついに950回めに彼女は30問に正解し，とうとう合格した。
+
+美談はさておき，通信社は過去949回の失敗した挑戦において，正答数は15から25の範囲であったと報告している。さて，彼女の正答率ー潜在的な能力はどの程度だと考えるべきだろうか。
+
+## データ
+```{r}
+nattempts  <- 950
+nfails     <- 949   
+n          <- 50    # Number of questions
+datastan <- list(nF=nfails,N=n)
+```
+
+
+## コード
+```{r, echo=FALSE, eval=TRUE}
+paste(readLines("censored.stan"), collapse = "\n") %>% cat()
+```
+
+## 結果
+```{r}
+modelEx1 <- stan_model("censored.stan")
+fit <- sampling(modelEx1,datastan)
+fit
+fit %>% as.array %>% bayesplot::mcmc_dens(pars="theta") + xlim(0,1) + ylim(0,160)
+```
+

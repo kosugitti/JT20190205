@@ -1,0 +1,62 @@
+---
+title: "Extra 2; 飛行機を再捕獲する"
+output: html_document
+---
+```{r libraries,echo=F,include=F}
+# データ整形汎用パッケージ
+library(tidyverse)
+# MCMC乱数発生器stanをRからつかうパッケージ
+library(rstan)
+# rstanを並列で使うオプション
+options(mc.cores = parallel::detectCores())
+# 変更なしの実行ファイルは保存しておくオプション
+rstan_options(auto_write = TRUE)
+# 描画の際に文字化けするMacユーザは次の行のコメントアウトをとって実行する
+old = theme_set(theme_gray(base_family = "HiraKakuProN-W3"))
+```
+
+## Case; 飛行機の保有台数は？
+
+ある小さな航空会社が，会社全体で何機の航空機を所有しているかを推定する問題を考えてみよう。ある日の空港で，あなたはその航空会社の飛行機のうちの10機が隣のゲートに留まっているのを見て，尾翼の識別番号を記録した。数日後別の空港で，あなたはその会社の飛行機のうちの5機をみつけた。それらの飛行機の尾翼番号を見ると，5機のうち4機が前回のリストと同じであった。
+
+## 捕獲-再捕獲問題
+
++ 一度とったサンプルをもう一度取った時，重複の程度から全体の大きさを推定する
+
+  + ある湖において魚はどれぐらい生息しているか？
+  + 同じ服を着まわしている人は，全体で何着ぐらい服を持っっているか？
+  + 意見をどの程度聴取するとある一定の割合をカバーしたといえるか？
+
+
+## 超幾何分布
+
+$t$を道の母集団サイズ，$z$を第一標本サイズ，$n$を第二標本サイズとし，$n$のうち$k$が第一標本と重複していたとすると，再捕獲の確率は，
+
+$$ \begin{array} { c } { \operatorname { Pr } ( K = k ) = \left( \begin{array} { l } { x } \\ { k } \end{array} \right) \left( \begin{array} { c } { t - x } \\ { n - k } \end{array} \right) / \left( \begin{array} { l } { t } \\ { n } \end{array} \right) } \end{array}$$
+
+となりますが，超幾何分布をつかって
+$$ k \sim Hypergeometric(n,x,t) $$
+と表すこともできます。
+
+
+## データ
+
+```{r}
+x <- 10 # number of captures
+k <- 4  # number of recaptures from n
+n <- 5  # size of second sample
+tmax <- 50 # maximum population size
+datastan <- list(X=x,N=n,K=k,TMax=tmax)
+```
+
+## コード
+```{r, echo=FALSE, eval=TRUE}
+paste(readLines("plane.stan"), collapse = "\n") %>% cat()
+```
+
+## 結果
+```{r}
+modelEx2 <- stan_model("plane.stan")
+fit <- sampling(modelEx2,datastan,algorithm="Fixed_param")
+fit %>% as.array %>% bayesplot::mcmc_hist(pars="t",binwidth=1)
+```

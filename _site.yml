@@ -1,0 +1,21 @@
+name: "ベイズ推定の基礎とデータ分析・予測への応用"
+navbar: 
+  title: "ベイズ推定の基礎とデータ分析・予測への応用"
+  left:
+    - text: "ごあんない"
+      href: index.html
+    - text: "Extra 1"
+      href: extra1.html
+    - text: "Extra 2"
+      href: extra2.html
+      
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    toc: true
+    toc_float:
+      collapse: false
+    df_print: "kable"
+    css: site_style.css
+output_dir: "docs"
